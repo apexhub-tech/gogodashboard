@@ -1,0 +1,1147 @@
+<title>Go Go Hankuk Admin</title>
+<meta name="description" content="Working admin dashboard for Go Go Hankuk — appointments, news, banners and team profiles." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#09243b; --navy-hover:#0f3352;
+    --blue:#087fbc; --blue-dark:#066a9e;
+    --bg:#f5f8fa; --white:#ffffff;
+    --ink:#17384d; --muted:#637d8b;
+    --tint:#e9f5fc; --line:#e1e9ee;
+    --green:#158064; --green-bg:#e8f6f0;
+    --amber:#976517; --amber-bg:#fff3dc;
+    --red:#ba4c50; --red-bg:#fbe9ea;
+    --side-text:#c7d7e0; --side-sub:#7fa6bb; --side-meta:#92b0c0;
+    --radius-lg:14px; --radius-md:10px; --radius-sm:8px; --radius-pill:999px;
+    --shadow-pop: 0 20px 48px -12px rgba(9,36,59,0.28);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'DM Sans',ui-sans-serif,system-ui,sans-serif;
+    font-size:14px; line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,p{margin:0;}
+  .h-manrope, .btn, .navlabel, .tabbtn, .th, .kpi-value, .cardtitle, th{font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;}
+  button{font:inherit; cursor:pointer;}
+  input, select, textarea{font:inherit;}
+  a{color:inherit; text-decoration:none;}
+  img{max-width:100%;}
+  [hidden]{display:none!important;}
+  ::selection{background:var(--tint); color:var(--ink);}
+
+  .icon{width:20px;height:20px;display:inline-flex;flex:none;}
+  .icon svg{width:100%;height:100%;display:block;}
+
+  /* ---------- app shell ---------- */
+  #app{min-height:100%;}
+  .shell{
+    display:flex; min-height:100vh; width:100%;
+    max-width:1440px; margin:0 auto; background:var(--bg);
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    width:240px; flex:none; background:var(--navy); color:var(--white);
+    display:flex; flex-direction:column; gap:32px; padding:24px;
+    position:sticky; top:0; align-self:flex-start; height:100vh;
+    overflow-y:auto;
+  }
+  .brand{display:flex; flex-direction:column; gap:4px;}
+  .brand .name{font-weight:800; font-size:18px; letter-spacing:0.2px;}
+  .brand .sub{font-size:10px; letter-spacing:1.2px; color:var(--side-sub); font-weight:700; text-transform:uppercase;}
+  .nav{display:flex; flex-direction:column; gap:8px;}
+  .nav-label{font-size:10px; letter-spacing:1.2px; color:var(--side-sub); font-weight:700; text-transform:uppercase; margin:0 0 2px 2px;}
+  .navitem{
+    display:flex; align-items:center; gap:12px; height:46px; padding-left:14px;
+    border-radius:var(--radius-sm); color:var(--side-text); font-size:13px; font-weight:500;
+    transition:background .15s ease, color .15s ease;
+  }
+  .navitem .icon{color:inherit;}
+  .navitem:hover{background:rgba(255,255,255,0.06); color:var(--white);}
+  .navitem.active{background:var(--blue); color:var(--white); font-weight:700;}
+  .sidebar-spacer{flex:1;}
+  .sidebar-link{display:flex; align-items:center; gap:10px; height:44px; color:var(--side-text); font-size:13px;}
+  .sidebar-link:hover{color:var(--white);}
+  .account{display:flex; align-items:center; gap:10px;}
+  .avatar{
+    width:34px; height:34px; border-radius:17px; background:var(--blue);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex:none;
+  }
+  .account .who{font-weight:800; font-size:12px;}
+  .account .org{font-size:11px; color:var(--side-meta);}
+
+  /* ---------- main / topbar ---------- */
+  .main{flex:1; min-width:0; display:flex; flex-direction:column;}
+  .topbar{
+    height:76px; background:var(--white); display:flex; align-items:center; justify-content:space-between;
+    padding:0 40px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5;
+  }
+  .crumb{font-size:13px; color:var(--muted);}
+  .crumb b{color:var(--ink); font-weight:700;}
+  .topbar-right{display:flex; align-items:center; gap:16px;}
+  .pill{display:inline-flex; align-items:center; justify-content:center; height:26px; padding:0 10px; border-radius:var(--radius-pill); font-size:11px; font-weight:500; white-space:nowrap;}
+  .pill-blue{background:var(--tint); color:var(--blue);}
+  .pill-green{background:var(--green-bg); color:var(--green);}
+  .pill-amber{background:var(--amber-bg); color:var(--amber);}
+  .meta{font-size:12px; color:var(--muted);}
+
+  .content{padding:40px; display:flex; flex-direction:column; gap:24px; max-width:1200px; width:100%;}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    height:42px; padding:0 18px; border-radius:var(--radius-sm); border:1px solid transparent;
+    font-weight:700; font-size:13px; white-space:nowrap; transition:filter .12s ease, background .12s ease;
+  }
+  .btn-primary{background:var(--blue); color:var(--white);}
+  .btn-primary:hover{background:var(--blue-dark);}
+  .btn-ghost{background:var(--white); border-color:var(--line); color:var(--ink);}
+  .btn-ghost:hover{background:var(--bg);}
+  .btn-ghost.active{background:var(--blue); border-color:var(--blue); color:var(--white);}
+  .btn-danger-text{color:var(--red); font-weight:700; font-size:13px; background:none; border:none; padding:0;}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .btn-sm{height:36px; padding:0 14px; font-size:12.5px;}
+
+  /* ---------- page heading ---------- */
+  .page-head{display:flex; align-items:flex-start; justify-content:space-between; gap:24px; flex-wrap:wrap;}
+  .page-head h1{font-weight:800; font-size:28px; letter-spacing:-.2px;}
+  .page-head .desc{font-size:14px; color:var(--muted); margin-top:6px; max-width:640px;}
+  .backlink{display:inline-flex; align-items:center; gap:6px; color:var(--blue); font-size:13px; font-weight:500;}
+  .backlink:hover{text-decoration:underline;}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--white); border:1px solid var(--line); border-radius:var(--radius-lg); padding:24px;}
+  .cardtitle{font-weight:800; font-size:18px;}
+  .banner-card{
+    background:var(--tint); border-radius:var(--radius-lg); padding:24px;
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  }
+  .banner-card .big{font-weight:800; font-size:20px;}
+  .banner-card .sub{color:var(--muted); font-size:14px; margin-top:6px;}
+
+  /* ---------- kpi grid ---------- */
+  .kpi-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
+  .kpi{background:var(--white); border:1px solid var(--line); border-radius:var(--radius-lg); padding:20px 22px; display:flex; flex-direction:column; gap:8px;}
+  .kpi .label{font-size:12px; color:var(--muted);}
+  .kpi-value{font-weight:800; font-size:30px; font-variant-numeric:tabular-nums;}
+  .kpi .foot{font-size:12px; color:var(--muted);}
+
+  /* ---------- two column ---------- */
+  .two-col{display:grid; grid-template-columns:1.85fr 1fr; gap:24px; align-items:start;}
+  @media (max-width:900px){ .two-col{grid-template-columns:1fr;} .kpi-grid{grid-template-columns:repeat(2,1fr);} }
+
+  /* ---------- table ---------- */
+  .tablewrap{width:100%; overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; min-width:560px;}
+  thead tr{background:var(--bg);}
+  th{text-align:left; font-size:11px; letter-spacing:.3px; color:var(--muted); font-weight:800; padding:12px 16px; text-transform:uppercase;}
+  td{padding:14px 16px; font-size:13px; border-top:1px solid var(--line); vertical-align:middle;}
+  tbody tr{transition:background .1s ease;}
+  tbody tr.clickable:hover{background:var(--bg); cursor:pointer;}
+  .status-pill{display:inline-flex; align-items:center; height:26px; padding:0 10px; border-radius:var(--radius-pill); font-size:11px; font-weight:500;}
+  .linklike{color:var(--blue); font-weight:700; cursor:pointer;}
+
+  /* ---------- shortcuts ---------- */
+  .shortcut{display:flex; align-items:center; gap:12px; padding:6px 0; cursor:pointer; border-radius:8px;}
+  .shortcut:hover .shortcut-title{color:var(--blue);}
+  .shortcut-ico{width:38px;height:38px;border-radius:10px;background:var(--tint);color:var(--blue);display:flex;align-items:center;justify-content:center;flex:none;}
+  .shortcut-title{font-weight:800; font-size:14px;}
+  .shortcut-sub{font-size:12px; color:var(--muted);}
+
+  /* ---------- tabs / filters ---------- */
+  .tabs{display:flex; gap:10px; flex-wrap:wrap;}
+  .filters{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;}
+  .field{display:flex; flex-direction:column; gap:8px;}
+  .field label{font-weight:800; font-size:12px;}
+  .search-box{
+    display:flex; align-items:center; gap:10px; height:42px; padding:0 14px;
+    border:1px solid var(--line); border-radius:var(--radius-sm); background:var(--white); color:var(--muted);
+    min-width:220px;
+  }
+  .search-box input{border:none; outline:none; background:none; width:100%; color:var(--ink); font-size:13px;}
+  .search-box input::placeholder{color:var(--muted);}
+  select.selectlike, .selectlike{
+    height:42px; padding:0 14px; border:1px solid var(--line); border-radius:var(--radius-sm);
+    background:var(--white); color:var(--ink); font-weight:700; font-size:13px;
+  }
+
+  /* ---------- form fields ---------- */
+  .form-row{display:flex; flex-direction:column; gap:8px; width:100%;}
+  .form-row label{font-weight:800; font-size:12px;}
+  .form-row .hint{font-size:11px; color:var(--muted); font-weight:400;}
+  .input, textarea.input, select.input{
+    width:100%; border:1px solid var(--line); border-radius:var(--radius-sm); padding:12px; font-size:14px;
+    color:var(--ink); background:var(--white); outline:none; font-family:inherit;
+  }
+  .input:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(8,127,188,.12);}
+  textarea.input{resize:vertical; min-height:64px;}
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .toggle-row .lbl{font-weight:800; font-size:13px;}
+  .switch{position:relative; width:42px; height:24px; border-radius:12px; background:var(--line); flex:none; transition:background .15s ease; border:none; padding:0;}
+  .switch::after{content:"";position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:var(--white); transition:transform .15s ease; box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  .switch.on{background:var(--green);}
+  .switch.on::after{transform:translateX(18px);}
+
+  .note-tint{background:var(--tint); border-radius:var(--radius-md); padding:16px 18px; display:flex; align-items:center; gap:12px; color:var(--blue); font-size:13px;}
+  .note-tint .icon{color:var(--blue);}
+  .note-plain{color:var(--muted); font-size:12px;}
+
+  /* ---------- pagination ---------- */
+  .pagination{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  .pagerow{display:flex; gap:2px; border:1px solid var(--line); border-radius:var(--radius-sm); overflow:hidden;}
+  .pagerow button{border:none; background:var(--white); height:42px; min-width:38px; padding:0 10px; font-weight:700; color:var(--ink);}
+  .pagerow button.current{background:var(--blue); color:var(--white);}
+  .pagerow button:hover:not(.current){background:var(--bg);}
+
+  /* ---------- banner preview ---------- */
+  .banner-hero{
+    height:272px; border-radius:var(--radius-md); padding:45px 28px 28px; color:var(--white);
+    display:flex; flex-direction:column; gap:14px; align-items:flex-start; justify-content:flex-start;
+    background-size:cover; background-position:center; position:relative; overflow:hidden;
+  }
+  .banner-hero::before{content:"";position:absolute; inset:0; background:linear-gradient(120deg, rgba(9,36,59,.55), rgba(9,36,59,.15));}
+  .banner-hero > *{position:relative;}
+  .banner-hero .title{font-weight:800; font-size:28px;}
+  .banner-hero .subtitle{font-size:17px;}
+  .order-row{display:flex; align-items:center; gap:14px; height:58px; padding:0 12px; border-radius:var(--radius-sm); cursor:pointer;}
+  .order-row .grip{color:var(--muted); font-size:15px; letter-spacing:2px;}
+  .order-row .num{font-size:12px; color:var(--muted); width:16px;}
+  .order-row .name{font-weight:800; font-size:13px; flex:1;}
+
+  /* ---------- team rows ---------- */
+  .team-row{display:flex; align-items:center; gap:16px; height:auto; min-height:66px; padding:12px 16px; border-radius:9px; flex-wrap:wrap;}
+  .team-photo{width:44px; height:44px; border-radius:22px; background:var(--tint); color:var(--blue); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex:none;}
+  .team-namewrap{min-width:180px;}
+  .team-name{font-weight:800; font-size:14px;}
+  .team-role{font-size:12px; color:var(--muted);}
+  .team-group{font-size:13px; color:var(--muted); min-width:110px;}
+
+  /* ---------- news editor ---------- */
+  .toolbar-fake{height:44px; background:var(--bg); display:flex; align-items:center; padding-left:16px; color:var(--muted); font-size:12px; border-radius:8px 8px 0 0; overflow-x:auto; white-space:nowrap;}
+  .editorbody{border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; padding:20px; display:flex; flex-direction:column; gap:12px;}
+  .editorbody h3{font-weight:800; font-size:18px;}
+  .upload-drop{
+    background:var(--bg); border:1.5px dashed var(--line); border-radius:var(--radius-md); padding:20px;
+    display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  }
+  .upload-ico{width:36px;height:36px;color:var(--blue);flex:none;}
+  .upload-title{font-weight:800; font-size:14px;}
+  .upload-sub{font-size:12px; color:var(--muted);}
+
+  /* ---------- modal / toast ---------- */
+  .overlay{position:fixed; inset:0; background:rgba(9,36,59,.45); display:flex; align-items:center; justify-content:center; padding:24px; z-index:50;}
+  .modal{background:var(--white); border-radius:16px; padding:28px; width:100%; max-width:480px; box-shadow:var(--shadow-pop); display:flex; flex-direction:column; gap:16px; max-height:86vh; overflow-y:auto;}
+  .modal.wide{max-width:640px;}
+  .modal h2{font-weight:800; font-size:20px;}
+  .modal .modal-desc{color:var(--muted); font-size:13px;}
+  .modal-actions{display:flex; justify-content:flex-end; gap:10px; margin-top:4px;}
+  .swatch-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .swatch{aspect-ratio:16/10; border-radius:10px; border:2px solid transparent; cursor:pointer; background-size:cover; background-position:center; display:flex; align-items:flex-end; padding:8px; color:#fff; font-size:11px; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .swatch.selected{border-color:var(--blue); box-shadow:0 0 0 3px rgba(8,127,188,.2);}
+
+  .toast-wrap{position:fixed; bottom:24px; right:24px; display:flex; flex-direction:column; gap:10px; z-index:60;}
+  .toast{
+    background:var(--navy); color:var(--white); padding:14px 18px; border-radius:var(--radius-sm);
+    display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; box-shadow:var(--shadow-pop);
+    animation:toastin .18s ease;
+  }
+  .toast .icon{color:var(--green);}
+  @keyframes toastin{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  /* ---------- preview panel (profile / news) ---------- */
+  .preview-portrait{
+    background:var(--tint); border-radius:12px; height:235px; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:14px;
+  }
+  .preview-portrait .team-photo{width:92px; height:92px; border-radius:46px; font-size:28px;}
+  .preview-sub{font-size:12px; color:var(--muted);}
+
+  /* ---------- mobile ---------- */
+  .menu-btn{display:none;}
+  @media (max-width:840px){
+    .shell{flex-direction:column;}
+    .sidebar{
+      position:fixed; z-index:40; left:0; top:0; height:100vh; transform:translateX(-100%);
+      transition:transform .2s ease; box-shadow:24px 0 48px rgba(0,0,0,.25);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .sidebar-backdrop{position:fixed; inset:0; background:rgba(9,36,59,.5); z-index:39;}
+    .topbar{padding:0 16px;}
+    .content{padding:20px 16px;}
+    .menu-btn{display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; border:1px solid var(--line); background:var(--white); color:var(--ink); margin-right:10px;}
+    .topbar-left{display:flex; align-items:center;}
+    .kpi-grid{grid-template-columns:1fr 1fr;}
+    .page-head{flex-direction:column;}
+    .card{padding:18px;}
+  }
+  @media (max-width:480px){
+    .kpi-grid{grid-template-columns:1fr;}
+  }
+</style>
+<div id="app"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+/* ============================== ICONS ============================== */
+const ICON = {
+  grid:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>`,
+  calendar:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>`,
+  news:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h4"/></svg>`,
+  image:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5a2 2 0 0 0-2.8 0L4 19"/></svg>`,
+  users:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="8.6" r="2.6"/><path d="M16 14.2c2.7.4 4.5 2.4 4.5 5.6"/></svg>`,
+  link:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5l5-5"/><path d="M11 6.5l1-1a4 4 0 1 1 5.5 5.5l-1 1"/><path d="M13 17.5l-1 1A4 4 0 1 1 6.5 13l1-1"/></svg>`,
+  search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
+  clock:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>`,
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>`,
+  upload:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>`,
+  arrowleft:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>`,
+  x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  menu:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>`,
+  plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>`,
+};
+function icon(name){ return `<span class="icon">${ICON[name]||''}</span>`; }
+
+/* ============================== DATA ============================== */
+const uid = (()=>{let n=1000; return (p)=>`${p}-${n++}`;})();
+
+let DATA = {
+  appointments: [
+    {id:'APT-0031', student:'Thiri Aye', phone:'09 512 334 482', date:'14 Sep 2026', dateSort:'2026-09-14', time:'09:30 AM', topic:'Korean classes', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 01', status:'confirmed', message:'Looking forward to discussing beginner Korean class schedules.'},
+    {id:'APT-0024', student:'Min Khant', phone:'09 771 220 482', date:'14 Sep 2026', dateSort:'2026-09-14', time:'10:15 AM', topic:'Study in Korea', location:'Online', meetingType:'Online consultation', counsellor:'Unassigned', status:'pending', message:'I would like to understand university options and the documents needed to begin my application.'},
+    {id:'APT-0032', student:'Su Htet', phone:'09 250 118 902', date:'14 Sep 2026', dateSort:'2026-09-14', time:'11:00 AM', topic:'University options', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 02', status:'confirmed', message:'Want to compare a few partner universities before applying.'},
+    {id:'APT-0033', student:'Aung Hein', phone:'09 660 442 118', date:'14 Sep 2026', dateSort:'2026-09-14', time:'01:30 PM', topic:'Study in Korea', location:'Office', meetingType:'In-person consultation', counsellor:'Unassigned', status:'pending', message:'First-time applicant, would like a general overview.'},
+    {id:'APT-0034', student:'May Thu', phone:'09 330 887 261', date:'15 Sep 2026', dateSort:'2026-09-15', time:'10:00 AM', topic:'Korean classes', location:'Online', meetingType:'Online consultation', counsellor:'Counsellor 01', status:'confirmed', message:'Wants to know about evening class options.'},
+    {id:'APT-0035', student:'Nyein Chan', phone:'09 118 552 900', date:'15 Sep 2026', dateSort:'2026-09-15', time:'02:00 PM', topic:'University options', location:'Office', meetingType:'In-person consultation', counsellor:'Unassigned', status:'pending', message:'Needs help comparing scholarship-eligible programs.'},
+    {id:'APT-0018', student:'Kyaw Zin', phone:'09 902 114 773', date:'11 Sep 2026', dateSort:'2026-09-11', time:'09:00 AM', topic:'Study in Korea', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 02', status:'completed', message:'Completed intro consultation.'},
+    {id:'APT-0012', student:'Hnin Wai', phone:'09 445 902 371', date:'09 Sep 2026', dateSort:'2026-09-09', time:'03:00 PM', topic:'Korean classes', location:'Online', meetingType:'Online consultation', counsellor:'Counsellor 01', status:'completed', message:'Completed placement discussion.'},
+  ],
+  news: [
+    {id:'N-1', title:'Preparing for your Korean study journey', desc:'A practical starting point for planning your studies in Korea.', category:'Student guide', status:'published', updated:'14 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'korean-study-journey', body:'Every study journey begins with a clear plan. Our team can help you explore Korean language classes, university options and the preparation needed for your next chapter.\n\nBook a consultation to discuss your goals and ask the questions that matter to you.'},
+    {id:'N-2', title:'Korean language classes: upcoming intake', desc:'New evening and weekend sections are now open for enrollment.', category:'Language classes', status:'draft', updated:'13 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'language-classes-intake', body:'Our next intake opens soon, with beginner through intermediate sections available in the evenings and on weekends.\n\nSeats are limited — enroll early to secure your preferred schedule.'},
+    {id:'N-3', title:'Meet our university partners', desc:'An introduction to the partner universities available through Go Go Hankuk.', category:'University news', status:'published', updated:'12 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'university-partners', body:'We work with a growing network of partner universities across Korea, spanning language programs, undergraduate and graduate study.\n\nTalk to a counsellor to find the right fit for your goals.'},
+    {id:'N-4', title:'A new chapter for our students', desc:'Stories from students who recently began their studies in Korea.', category:'Student stories', status:'published', updated:'10 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'new-chapter-students', body:'Hear directly from students who have recently started their programs — the preparation, the nerves, and the excitement of the first semester.'},
+    {id:'N-5', title:'Visit Go Go Hankuk for a consultation', desc:'Walk-in and scheduled consultations are now available at our office.', category:'Announcements', status:'draft', updated:'09 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'visit-for-consultation', body:'Our office is open for both walk-in and scheduled consultations. Bring your questions about classes, universities, or the application process.'},
+    {id:'N-6', title:'Inside our Yangon classroom', desc:'A look at the facilities and teaching approach at our Yangon campus.', category:'Campus life', status:'published', updated:'08 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'yangon-classroom', body:'Take a look inside our Yangon classroom, where small class sizes and dedicated instructors help students build confidence in Korean.'},
+  ],
+  banners: [
+    {id:'B-1', title:'Study in Korea', subtitle:'Your future begins with Go Go Education', button:'Discover our programs', dest:'Academic', alt:'Students studying together in a library', active:true, order:1, bg:'linear-gradient(135deg,#16465e,#0a2c3d)'},
+    {id:'B-2', title:'Korean language classes', subtitle:'New intakes open for evening and weekend sections', button:'View class schedule', dest:'Language classes', alt:'Students in a Korean language classroom', active:true, order:2, bg:'linear-gradient(135deg,#0f3a52,#09243b)'},
+    {id:'B-3', title:'Book a consultation', subtitle:'Talk to a counsellor about your study options', button:'Book now', dest:'Appointments', alt:'A counsellor meeting with a student', active:true, order:3, bg:'linear-gradient(135deg,#1c5473,#123c53)'},
+  ],
+  team: [
+    {id:'T-1', name:'Zun Phu Wai', role:'Founder & Managing Director', group:'Leadership', status:'published', initials:'ZW', order:1, intro:'Leading Go Go Hankuk’s vision and supporting students on their education journey.', bio:'Zun Phu Wai is the Founder and Chief Executive Officer of Go Go Hankuk, leading the company’s strategic direction and overall operations.\n\nHer leadership is centered on professional, transparent and student-focused services.'},
+    {id:'T-2', name:'Nay Myo Thura Naing', role:'Director', group:'Leadership', status:'published', initials:'NN', order:2, intro:'Overseeing daily operations and partnerships with universities in Korea.', bio:'Nay Myo Thura Naing directs operations and maintains Go Go Hankuk’s partnerships with universities and language institutes across Korea.'},
+    {id:'T-3', name:'Staff member 01', role:'Student counsellor', group:'Our Team', status:'draft', initials:'01', order:3, intro:'Helping students plan their consultations and applications.', bio:'Staff member 01 supports students from their first inquiry through their application to study in Korea.'},
+    {id:'T-4', name:'Staff member 02', role:'Admissions coordinator', group:'Our Team', status:'draft', initials:'02', order:4, intro:'Coordinating admissions documents and university submissions.', bio:'Staff member 02 coordinates admissions paperwork and liaises with partner universities on behalf of students.'},
+    {id:'T-5', name:'Staff member 03', role:'Korean language instructor', group:'Our Team', status:'draft', initials:'03', order:5, intro:'Teaching beginner and intermediate Korean language classes.', bio:'Staff member 03 teaches Korean language classes and designs curriculum for new intakes.'},
+    {id:'T-6', name:'Staff member 04', role:'Office administration', group:'Our Team', status:'draft', initials:'04', order:6, intro:'Keeping the office running and supporting walk-in visitors.', bio:'Staff member 04 manages front-office administration and welcomes walk-in visitors and students.'},
+  ],
+};
+
+const SWATCHES = [
+  {name:'Library', bg:'linear-gradient(135deg,#2c5f7c,#123244)'},
+  {name:'Campus walk', bg:'linear-gradient(135deg,#3a7360,#123326)'},
+  {name:'Classroom', bg:'linear-gradient(135deg,#7c5a2c,#3a2a10)'},
+  {name:'City skyline', bg:'linear-gradient(135deg,#4a4f7c,#181a33)'},
+  {name:'Graduation', bg:'linear-gradient(135deg,#7c2c5e,#33122a)'},
+  {name:'Consultation', bg:'linear-gradient(135deg,#2c7c72,#0f2e2a)'},
+];
+
+/* ============================== STATE / ROUTER ============================== */
+let STATE = { selectedBanner: DATA.banners[0].id, sidebarOpen:false, imagePicker:null };
+
+function navigate(hash){ location.hash = hash; }
+function currentRoute(){
+  const h = (location.hash || '#/overview').replace(/^#/, '');
+  const parts = h.split('/').filter(Boolean);
+  return parts;
+}
+window.addEventListener('hashchange', render);
+
+/* ============================== HELPERS ============================== */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
+function statusPill(status){
+  const map = {
+    pending:['pill-amber','Pending'], confirmed:['pill-green','Confirmed'], completed:['pill-blue','Completed'],
+    published:['pill-green','Published'], draft:['pill-amber','Draft'],
+  };
+  const [cls,label] = map[status] || ['pill-blue', status];
+  return `<span class="status-pill ${cls}">${label}</span>`;
+}
+function toast(msg){
+  const wrap = document.getElementById('toastWrap');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `${icon('check')}<span>${esc(msg)}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.transition='opacity .25s ease, transform .25s ease'; el.style.opacity='0'; el.style.transform='translateY(8px)'; setTimeout(()=>el.remove(), 260); }, 2400);
+}
+function closeModal(){ const m = document.getElementById('modalRoot'); if(m) m.remove(); }
+function openModal(html){
+  closeModal();
+  const div = document.createElement('div');
+  div.id = 'modalRoot';
+  div.className = 'overlay';
+  div.innerHTML = html;
+  div.addEventListener('click', (e)=>{ if(e.target === div) closeModal(); });
+  document.body.appendChild(div);
+}
+
+/* ============================== SIDEBAR / TOPBAR ============================== */
+const NAV_ITEMS = [
+  {key:'overview', label:'Overview', icon:'grid'},
+  {key:'appointments', label:'Appointments', icon:'calendar'},
+  {key:'news', label:'News', icon:'news'},
+  {key:'banners', label:'Banners', icon:'image'},
+  {key:'team', label:'Team Profiles', icon:'users'},
+];
+function sidebarHtml(activeKey){
+  return `
+  <aside class="sidebar ${STATE.sidebarOpen?'open':''}" id="sidebar">
+    <div class="brand">
+      <div class="name">GO GO HANKUK</div>
+      <div class="sub">Admin Workspace</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Workspace</div>
+      ${NAV_ITEMS.map(it=>`
+        <a class="navitem ${it.key===activeKey?'active':''}" data-nav="${it.key}">
+          ${icon(it.icon)}<span>${it.label}</span>
+        </a>`).join('')}
+    </nav>
+    <div class="sidebar-spacer"></div>
+    <a class="sidebar-link" href="#" data-action="view-website">${icon('link')}<span>View website</span></a>
+    <div class="account">
+      <div class="avatar">A</div>
+      <div>
+        <div class="who">Administrator</div>
+        <div class="org">Go Go Hankuk</div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" data-action="close-sidebar" ${STATE.sidebarOpen?'':'hidden'}></div>`;
+}
+function topbarHtml(crumb){
+  return `
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" data-action="toggle-sidebar">${icon('menu')}</button>
+      <div class="crumb">Workspace&nbsp; / &nbsp;<b>${esc(crumb)}</b></div>
+    </div>
+    <div class="topbar-right">
+      <span class="pill pill-blue">Demo workspace</span>
+      <span class="meta">EN &nbsp;·&nbsp; Admin</span>
+    </div>
+  </div>`;
+}
+function shellWrap(activeKey, crumb, contentHtml){
+  return `
+  <div class="shell">
+    ${sidebarHtml(activeKey)}
+    <div class="main">
+      ${topbarHtml(crumb)}
+      <div class="content">${contentHtml}</div>
+    </div>
+  </div>`;
+}
+
+/* ============================== PAGE: OVERVIEW ============================== */
+function pageOverview(){
+  const todays = DATA.appointments.filter(a=>a.dateSort==='2026-09-14');
+  const pending = DATA.appointments.filter(a=>a.status==='pending').length;
+  const confirmedToday = todays.filter(a=>a.status==='confirmed').length;
+  const publishedNews = DATA.news.filter(n=>n.status==='published').length;
+  const draftNews = DATA.news.filter(n=>n.status==='draft').length;
+  const activeBanners = DATA.banners.filter(b=>b.active).length;
+
+  const rows = todays.slice(0,4).map(a=>`
+    <tr>
+      <td>${esc(a.student)}</td>
+      <td>${esc(a.time)}</td>
+      <td>${esc(a.topic)}</td>
+      <td>${statusPill(a.status)}</td>
+    </tr>`).join('');
+
+  return shellWrap('overview','Overview', `
+    <div class="page-head">
+      <div>
+        <h1>A clear view of your day.</h1>
+        <div class="desc">Manage student appointments and keep your website up to date.</div>
+      </div>
+      <button class="btn btn-primary" data-nav="appointments">View appointments</button>
+    </div>
+
+    <div class="banner-card">
+      <div>
+        <div class="big">${pending} appointment request${pending===1?'':'s'} need your attention</div>
+        <div class="sub">Review preferred times, assign a counsellor and send a confirmation.</div>
+      </div>
+      <button class="btn btn-primary" data-nav="appointments">Review requests</button>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Today’s appointments</div><div class="kpi-value">${String(todays.length).padStart(2,'0')}</div><div class="foot">${confirmedToday} confirmed · ${todays.length-confirmedToday} pending</div></div>
+      <div class="kpi"><div class="label">Pending requests</div><div class="kpi-value">${String(pending).padStart(2,'0')}</div><div class="foot">Ready for review</div></div>
+      <div class="kpi"><div class="label">Published news</div><div class="kpi-value">${String(publishedNews).padStart(2,'0')}</div><div class="foot">${draftNews} draft${draftNews===1?'':'s'} in progress</div></div>
+      <div class="kpi"><div class="label">Active banners</div><div class="kpi-value">${String(activeBanners).padStart(2,'0')}</div><div class="foot">Homepage slideshow</div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <div class="cardtitle">Today’s appointments</div>
+          <div class="meta">14 Sep 2026</div>
+        </div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Student</th><th>Time</th><th>Topic</th><th>Status</th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" class="meta" style="padding:20px 16px;">No appointments scheduled for today.</td></tr>`}</tbody>
+        </table></div>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="cardtitle">Keep your website fresh</div>
+        <div class="shortcut" data-nav="news/new">
+          <div class="shortcut-ico">${icon('news')}</div>
+          <div><div class="shortcut-title">Create news</div><div class="shortcut-sub">Share your latest updates</div></div>
+        </div>
+        <div class="shortcut" data-nav="banners">
+          <div class="shortcut-ico">${icon('image')}</div>
+          <div><div class="shortcut-title">Update a banner</div><div class="shortcut-sub">Refresh the homepage</div></div>
+        </div>
+        <div class="shortcut" data-nav="team">
+          <div class="shortcut-ico">${icon('users')}</div>
+          <div><div class="shortcut-title">Edit team profiles</div><div class="shortcut-sub">Keep names and roles current</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="note-plain">Sample data shown for design preview. All times are Myanmar Time (UTC+6:30).</div>
+  `);
+}
+
+/* ============================== PAGE: APPOINTMENTS ============================== */
+let apptFilter = 'all';
+let apptSearch = '';
+function pageAppointments(){
+  const counts = {
+    all: DATA.appointments.length,
+    pending: DATA.appointments.filter(a=>a.status==='pending').length,
+    confirmed: DATA.appointments.filter(a=>a.status==='confirmed').length,
+    completed: DATA.appointments.filter(a=>a.status==='completed').length,
+  };
+  let list = DATA.appointments.filter(a=> apptFilter==='all' || a.status===apptFilter);
+  if(apptSearch.trim()){
+    const q = apptSearch.trim().toLowerCase();
+    list = list.filter(a=> a.student.toLowerCase().includes(q) || a.phone.includes(q));
+  }
+  const rows = list.map(a=>`
+    <tr class="clickable" data-nav="appointments/${a.id}">
+      <td>${esc(a.student)}</td>
+      <td>${esc(a.date)} · ${esc(a.time)}</td>
+      <td>${esc(a.location)} · ${esc(a.topic)}</td>
+      <td>${esc(a.counsellor)}</td>
+      <td>${statusPill(a.status)}</td>
+      <td><span class="linklike">View</span></td>
+    </tr>`).join('');
+
+  return shellWrap('appointments','Appointments', `
+    <div class="page-head">
+      <div>
+        <h1>Appointments</h1>
+        <div class="desc">Review requests, coordinate counsellors and manage consultation times.</div>
+      </div>
+      <button class="btn btn-primary" data-action="add-appointment">${icon('plus')} Add appointment</button>
+    </div>
+
+    <div class="tabs">
+      <button class="btn ${apptFilter==='all'?'btn-primary':'btn-ghost'}" data-action="appt-filter" data-val="all">All appointments&nbsp; ${counts.all}</button>
+      <button class="btn ${apptFilter==='pending'?'btn-primary':'btn-ghost'}" data-action="appt-filter" data-val="pending">Pending&nbsp; ${counts.pending}</button>
+      <button class="btn ${apptFilter==='confirmed'?'btn-primary':'btn-ghost'}" data-action="appt-filter" data-val="confirmed">Confirmed&nbsp; ${counts.confirmed}</button>
+      <button class="btn ${apptFilter==='completed'?'btn-primary':'btn-ghost'}" data-action="appt-filter" data-val="completed">Completed&nbsp; ${counts.completed}</button>
+    </div>
+
+    <div class="filters">
+      <div class="search-box" style="width:340px;">${icon('search')}<input id="apptSearchInput" placeholder="Search name or phone number" value="${esc(apptSearch)}"></div>
+      <div class="selectlike">14–20 Sep 2026</div>
+      <div class="selectlike">All counsellors</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
+        <div class="cardtitle">Upcoming consultations</div>
+        <div class="meta">Showing ${list.length} of ${DATA.appointments.length} appointments</div>
+      </div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Student</th><th>Date &amp; time</th><th>Consultation</th><th>Counsellor</th><th>Status</th><th></th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="6" class="meta" style="padding:20px 16px;">No appointments match this view.</td></tr>`}</tbody>
+      </table></div>
+    </div>
+
+    <div class="note-tint">${icon('clock')}<span>Set office hours and unavailable dates before accepting appointment requests.</span></div>
+  `);
+}
+
+/* ============================== PAGE: APPOINTMENT DETAIL ============================== */
+function pageAppointmentDetail(id){
+  const a = DATA.appointments.find(x=>x.id===id);
+  if(!a) return pageNotFound('appointments');
+  const isConfirmed = a.status !== 'pending';
+  return shellWrap('appointments','Appointment details', `
+    <a class="backlink" data-nav="appointments">${icon('arrowleft')} Back to appointments</a>
+    <div class="page-head">
+      <div>
+        <h1>${a.status==='pending' ? 'Appointment request' : 'Appointment'}</h1>
+        <div class="desc">${esc(a.id)} · Received 14 Sep 2026 at 08:42 AM</div>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <div class="h-manrope" style="font-weight:800;font-size:24px;">${esc(a.student)}</div>
+            <div class="meta">Student consultation</div>
+          </div>
+          ${statusPill(a.status)}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          ${detailRow('Phone number', a.phone)}
+          ${detailRow('Consultation topic', a.topic)}
+          ${detailRow('Meeting type', a.meetingType)}
+          ${detailRow('Preferred appointment', `${a.date} · ${a.time}`)}
+          ${detailRow('Timezone', 'Myanmar Time (UTC+6:30)')}
+        </div>
+        <div style="background:var(--bg);border-radius:8px;padding:18px;margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="font-weight:800;font-size:10px;color:var(--muted);letter-spacing:.5px;">STUDENT MESSAGE</div>
+          <div>${esc(a.message)}</div>
+        </div>
+        <div class="form-row" style="margin-top:16px;">
+          <label>Internal notes</label>
+          <textarea class="input" id="apptNotes" placeholder="Add a note for your team…" rows="3"></textarea>
+        </div>
+        <div class="note-plain" style="margin-top:6px;">Only your team can see internal notes.</div>
+      </div>
+
+      <div class="card" style="display:flex;flex-direction:column;gap:16px;">
+        <div style="font-weight:800;font-size:20px;">${isConfirmed ? 'Appointment status' : 'Review this request'}</div>
+        <div class="form-row">
+          <label>Assign a counsellor</label>
+          <select class="input" id="apptCounsellor">
+            ${['Unassigned','Counsellor 01','Counsellor 02'].map(c=>`<option ${a.counsellor===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row"><label>Confirmed date</label><div class="input" style="color:var(--muted);">${esc(a.date)}</div></div>
+        <div class="form-row"><label>Confirmed time</label><div class="input" style="color:var(--muted);">${esc(a.time)}</div></div>
+        <div style="background:var(--green-bg);border-radius:8px;padding:12px;display:flex;gap:10px;align-items:center;">
+          ${icon('check')}<span style="color:var(--green);font-size:12px;">Available at selected time</span>
+        </div>
+        ${isConfirmed
+          ? `<div class="btn btn-primary" style="width:100%;pointer-events:none;opacity:.85;">${icon('check')} Confirmed</div>`
+          : `<button class="btn btn-primary" style="width:100%;" data-action="confirm-appt" data-id="${a.id}">Confirm Appointment</button>
+             <button class="btn btn-ghost" style="width:100%;" data-action="propose-time" data-id="${a.id}">Propose another time</button>`
+        }
+        <button class="btn-danger-text" data-action="cancel-appt" data-id="${a.id}" style="text-align:left;">Cancel request</button>
+        <div class="note-plain" style="font-weight:700;color:var(--muted);">Send the student a confirmation after the appointment time is approved.</div>
+      </div>
+    </div>
+  `);
+}
+function detailRow(label, value){
+  return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+    <div style="width:190px;color:var(--muted);font-size:13px;">${esc(label)}</div>
+    <div style="font-weight:800;font-size:14px;flex:1;min-width:160px;">${esc(value)}</div>
+  </div>`;
+}
+
+/* ============================== PAGE: NEWS ============================== */
+let newsFilter = 'all';
+let newsSearch = '';
+function pageNews(){
+  const counts = { all: DATA.news.length, published: DATA.news.filter(n=>n.status==='published').length, draft: DATA.news.filter(n=>n.status==='draft').length };
+  let list = DATA.news.filter(n=> newsFilter==='all' || n.status===newsFilter);
+  if(newsSearch.trim()){ const q=newsSearch.trim().toLowerCase(); list = list.filter(n=>n.title.toLowerCase().includes(q)); }
+  const rows = list.map(n=>`
+    <tr>
+      <td>${esc(n.title)}</td>
+      <td>${esc(n.category)}</td>
+      <td>${statusPill(n.status)}</td>
+      <td>${esc(n.updated)}</td>
+      <td><button class="btn btn-ghost btn-sm" data-nav="news/${n.id}">Edit</button></td>
+    </tr>`).join('');
+
+  return shellWrap('news','News', `
+    <div class="page-head">
+      <div><h1>News &amp; updates</h1><div class="desc">Write, review and publish stories for your students.</div></div>
+      <button class="btn btn-primary" data-nav="news/new">${icon('plus')} Create News</button>
+    </div>
+    <div class="tabs">
+      <button class="btn ${newsFilter==='all'?'btn-primary':'btn-ghost'}" data-action="news-filter" data-val="all">All news&nbsp; ${counts.all}</button>
+      <button class="btn ${newsFilter==='published'?'btn-primary':'btn-ghost'}" data-action="news-filter" data-val="published">Published&nbsp; ${counts.published}</button>
+      <button class="btn ${newsFilter==='draft'?'btn-primary':'btn-ghost'}" data-action="news-filter" data-val="draft">Drafts&nbsp; ${counts.draft}</button>
+    </div>
+    <div class="filters">
+      <div class="search-box" style="width:400px;">${icon('search')}<input id="newsSearchInput" placeholder="Search news title…" value="${esc(newsSearch)}"></div>
+      <div class="selectlike">All categories</div>
+      <div class="selectlike">Newest first</div>
+    </div>
+    <div class="card">
+      <div class="cardtitle" style="margin-bottom:20px;">Your news library</div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="5" class="meta" style="padding:20px 16px;">No articles match this view.</td></tr>`}</tbody>
+      </table></div>
+    </div>
+    <div class="note-tint">${icon('check')}<span>Drafts stay private. Preview each post before publishing it on your website.</span></div>
+  `);
+}
+
+/* ============================== PAGE: NEWS EDITOR ============================== */
+function pageNewsEditor(id){
+  const isNew = id === 'new';
+  const n = isNew ? {id:null, title:'', desc:'', category:'Student guide', status:'draft', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'', body:'', updated:'—'} : DATA.news.find(x=>x.id===id);
+  if(!n) return pageNotFound('news');
+  return shellWrap('news','News editor', `
+    <a class="backlink" data-nav="news">${icon('arrowleft')} Back to news</a>
+    <div class="page-head">
+      <h1>${isNew?'Create news':'Edit news'}</h1>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" data-action="news-save-draft" data-id="${esc(n.id||'')}">Save Draft</button>
+        <button class="btn btn-ghost" data-action="news-preview" data-id="${esc(n.id||'')}">Preview</button>
+        <button class="btn btn-primary" data-action="news-publish" data-id="${esc(n.id||'')}">Publish News</button>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card" style="display:flex;flex-direction:column;gap:20px;">
+        <div class="form-row"><label>News title</label><input class="input" id="newsTitle" value="${esc(n.title)}" placeholder="Give your story a clear title"></div>
+        <div class="form-row"><label>Short description</label><textarea class="input" id="newsDesc" rows="2" placeholder="A one-sentence summary">${esc(n.desc)}</textarea></div>
+        <div class="form-row">
+          <label>Cover image</label>
+          <div class="upload-drop">
+            <div class="upload-ico">${icon('upload')}</div>
+            <div style="flex:1;min-width:180px;">
+              <div class="upload-title">Drop an image here or browse files</div>
+              <div class="upload-sub">JPG, PNG or WebP · Recommended 1600 × 900</div>
+            </div>
+            <button class="btn btn-ghost" data-action="choose-image" data-target="newsCover">Choose image</button>
+          </div>
+        </div>
+        <div>
+          <div class="toolbar-fake">Paragraph &nbsp;↓&nbsp;&nbsp;|&nbsp;&nbsp; <b>B</b>&nbsp; <i>I</i>&nbsp; U &nbsp;|&nbsp; • List&nbsp; 1. List &nbsp;|&nbsp; Link</div>
+          <div class="editorbody">
+            <textarea class="input" id="newsBody" rows="8" style="border:none;padding:0;" placeholder="Write your article…">${esc(n.body)}</textarea>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:18px;">
+        <div style="font-weight:800;font-size:19px;">Publishing</div>
+        ${statusPill(n.status)}
+        <div class="form-row"><label>Category</label>
+          <select class="input" id="newsCategory">
+            ${['Student guide','Language classes','University news','Student stories','Announcements','Campus life'].map(c=>`<option ${n.category===c?'selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row"><label>Author</label><input class="input" id="newsAuthor" value="${esc(n.author)}"></div>
+        <div class="form-row"><label>Publish date</label><div class="input" style="color:var(--muted);">${esc(n.publishDate)}</div></div>
+        <div class="form-row"><label>Website language</label><div class="input" style="color:var(--muted);">English</div></div>
+        <div class="form-row"><label>URL slug</label><input class="input" id="newsSlug" value="${esc(n.slug)}"></div>
+        <div class="note-plain" style="font-weight:700;">Draft changes are not visible on the website until you publish.</div>
+      </div>
+    </div>
+  `);
+}
+
+/* ============================== PAGE: BANNERS ============================== */
+function pageBanners(){
+  const selected = DATA.banners.find(b=>b.id===STATE.selectedBanner) || DATA.banners[0];
+  const ordered = [...DATA.banners].sort((a,b)=>a.order-b.order);
+  const rows = ordered.map(b=>`
+    <div class="order-row ${b.id===selected.id?'':''}" style="background:${b.id===selected.id?'var(--tint)':'var(--bg)'};" data-action="select-banner" data-id="${b.id}">
+      <span class="grip">⋮⋮</span>
+      <span class="num">${String(b.order).padStart(2,'0')}</span>
+      <span class="name">${esc(b.title)}</span>
+      <span class="status-pill ${b.active?'pill-green':'pill-amber'}">${b.active?'Active':'Hidden'}</span>
+    </div>`).join('');
+
+  return shellWrap('banners','Banners', `
+    <div class="page-head">
+      <div><h1>Homepage banners</h1><div class="desc">Change images, edit messages and choose what students see first.</div></div>
+      <button class="btn btn-primary" data-action="add-banner">${icon('plus')} Add Banner</button>
+    </div>
+    <div class="two-col">
+      <div class="card" style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="cardtitle">Homepage preview</div>
+          <span class="pill pill-blue">Desktop</span>
+        </div>
+        <div class="banner-hero" style="background-image:${selected.bg};">
+          <div class="title">${esc(selected.title)}</div>
+          <div class="subtitle">${esc(selected.subtitle)}</div>
+          <div class="btn btn-primary" style="pointer-events:none;">${esc(selected.button)}</div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-ghost" data-action="choose-image" data-target="bannerHero">Replace image</button>
+          <div class="selectlike">Adjust crop</div>
+        </div>
+        <div style="font-weight:800;font-size:16px;">Banner order</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">${rows}</div>
+        <div class="note-plain">Drag banners to change their display order. Click a banner to edit it.</div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:18px;">
+        <div style="font-weight:800;font-size:20px;">Edit banner</div>
+        <div class="form-row"><label>Title</label><input class="input" id="bannerTitle" value="${esc(selected.title)}"></div>
+        <div class="form-row"><label>Subtitle</label><textarea class="input" id="bannerSubtitle" rows="2">${esc(selected.subtitle)}</textarea></div>
+        <div class="form-row"><label>Button label</label><input class="input" id="bannerButton" value="${esc(selected.button)}"></div>
+        <div class="form-row"><label>Button destination</label>
+          <select class="input" id="bannerDest">
+            ${['Academic','Language classes','Appointments','Homepage','News'].map(d=>`<option ${selected.dest===d?'selected':''}>${d}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row"><label>Image description (alt text)</label><textarea class="input" id="bannerAlt" rows="2">${esc(selected.alt)}</textarea></div>
+        <div class="toggle-row">
+          <span class="lbl">Show on homepage</span>
+          <button class="switch ${selected.active?'on':''}" data-action="toggle-banner-active" data-id="${selected.id}"></button>
+        </div>
+        <div class="note-plain" style="font-weight:700;">Recommended image: 1920 × 900 px · JPG, PNG or WebP. Keep text within the safe area.</div>
+        <button class="btn btn-primary" style="width:100%;" data-action="save-banner" data-id="${selected.id}">Save Changes</button>
+        <div class="note-plain">Changes go live after you save.</div>
+      </div>
+    </div>
+  `);
+}
+
+/* ============================== PAGE: TEAM ============================== */
+let teamFilter = 'all';
+let teamSearch = '';
+function pageTeam(){
+  const counts = { all: DATA.team.length, Leadership: DATA.team.filter(t=>t.group==='Leadership').length, 'Our Team': DATA.team.filter(t=>t.group==='Our Team').length };
+  let list = [...DATA.team].sort((a,b)=>a.order-b.order).filter(t=> teamFilter==='all' || t.group===teamFilter);
+  if(teamSearch.trim()){ const q = teamSearch.trim().toLowerCase(); list = list.filter(t=> t.name.toLowerCase().includes(q) || t.role.toLowerCase().includes(q)); }
+
+  const rows = list.map(t=>`
+    <div class="team-row" style="background:var(--bg);">
+      <span class="grip" style="color:var(--muted);font-size:15px;">⋮⋮</span>
+      <div class="team-photo">${esc(t.initials)}</div>
+      <div class="team-namewrap"><div class="team-name">${esc(t.name)}</div><div class="team-role">${esc(t.role)}</div></div>
+      <div class="team-group">${esc(t.group)}</div>
+      <div style="min-width:100px;">${statusPill(t.status)}</div>
+      <button class="btn btn-ghost btn-sm" data-nav="team/${t.id}" style="margin-left:auto;">Edit Profile</button>
+    </div>`).join('');
+
+  return shellWrap('team','Team profiles', `
+    <div class="page-head">
+      <div><h1>Team profiles</h1><div class="desc">Keep your leadership and staff profiles accurate, welcoming and up to date.</div></div>
+      <button class="btn btn-primary" data-action="add-profile">${icon('plus')} Add Profile</button>
+    </div>
+    <div class="tabs">
+      <button class="btn ${teamFilter==='all'?'btn-primary':'btn-ghost'}" data-action="team-filter" data-val="all">All profiles&nbsp; ${counts.all}</button>
+      <button class="btn ${teamFilter==='Leadership'?'btn-primary':'btn-ghost'}" data-action="team-filter" data-val="Leadership">Leadership&nbsp; ${counts.Leadership}</button>
+      <button class="btn ${teamFilter==='Our Team'?'btn-primary':'btn-ghost'}" data-action="team-filter" data-val="Our Team">Our Team&nbsp; ${counts['Our Team']}</button>
+    </div>
+    <div class="filters">
+      <div class="search-box" style="width:380px;">${icon('search')}<input id="teamSearchInput" placeholder="Search name or role…" value="${esc(teamSearch)}"></div>
+      <div class="selectlike">All profiles</div>
+      <div class="selectlike">Website display order</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="cardtitle">People on your website</div>
+        <div class="meta">Drag to reorder within each group</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">${rows || `<div class="meta" style="padding:20px 0;">No profiles match this view.</div>`}</div>
+    </div>
+    <div class="note-plain">Staff entries and initials are placeholders. Replace them with your team’s details and photos.</div>
+  `);
+}
+
+/* ============================== PAGE: PROFILE EDITOR ============================== */
+function pageProfileEditor(id){
+  const isNew = id === 'new';
+  const t = isNew ? {id:null, name:'', role:'', group:'Our Team', order:DATA.team.length+1, intro:'', bio:'', status:'draft', initials:'--'} : DATA.team.find(x=>x.id===id);
+  if(!t) return pageNotFound('team');
+  return shellWrap('team','Profile editor', `
+    <a class="backlink" data-nav="team">${icon('arrowleft')} Back to profiles</a>
+    <div class="page-head">
+      <h1>${isNew?'Add profile':'Edit profile'}</h1>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-ghost" data-action="profile-preview">Preview</button>
+        <button class="btn btn-primary" data-action="profile-save" data-id="${esc(t.id||'')}">Save Changes</button>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card" style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+          <div class="team-photo" style="width:88px;height:88px;border-radius:44px;font-size:26px;" id="profilePhotoPreview">${esc(t.initials)}</div>
+          <div style="flex:1;min-width:220px;">
+            <div style="font-weight:800;font-size:15px;">Profile photo</div>
+            <div class="meta">Use a clear portrait with a simple background.</div>
+            <div class="meta">JPG, PNG or WebP · Recommended 800 × 1000 px</div>
+          </div>
+          <button class="btn btn-ghost" data-action="choose-image" data-target="profilePhoto">Change photo</button>
+        </div>
+        <div class="form-row"><label>Full name</label><input class="input" id="profileName" value="${esc(t.name)}"></div>
+        <div class="form-row"><label>Position / title</label><input class="input" id="profileRole" value="${esc(t.role)}"></div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div class="form-row" style="flex:1;min-width:220px;"><label>Profile group</label>
+            <select class="input" id="profileGroup">
+              <option ${t.group==='Leadership'?'selected':''}>Leadership</option>
+              <option ${t.group==='Our Team'?'selected':''}>Our Team</option>
+            </select>
+          </div>
+          <div class="form-row" style="flex:1;min-width:160px;"><label>Display order</label><input class="input" id="profileOrder" type="number" value="${t.order}"></div>
+        </div>
+        <div class="form-row"><label>Short introduction</label><textarea class="input" id="profileIntro" rows="2">${esc(t.intro)}</textarea></div>
+        <div class="form-row"><label>Biography</label><textarea class="input" id="profileBio" rows="5">${esc(t.bio)}</textarea></div>
+        <div class="toggle-row">
+          <span class="lbl">Show this profile on About Us</span>
+          <button class="switch ${t.status==='published'?'on':''}" data-action="toggle-profile-visible" data-id="${esc(t.id||'')}"></button>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:16px;">
+        <div class="cardtitle">Website preview</div>
+        <div class="meta">${esc(t.group)} profile</div>
+        <div class="preview-portrait">
+          <div class="team-photo">${esc(t.initials)}</div>
+          <div class="preview-sub">Profile photo preview</div>
+        </div>
+        <div style="font-weight:800;font-size:23px;" id="previewName">${esc(t.name)||'Full name'}</div>
+        <div style="font-weight:800;font-size:13px;color:var(--blue);" id="previewRole">${esc(t.role)||'Position / title'}</div>
+        <div style="color:var(--muted);" id="previewIntro">${esc(t.intro)||'Short introduction appears here.'}</div>
+        <div class="note-plain">Leadership profiles use a larger layout. Our Team profiles appear as compact carousel cards.</div>
+      </div>
+    </div>
+  `);
+}
+
+function pageNotFound(back){
+  return shellWrap(back,'Not found', `<div class="card">This item could not be found. <a class="linklike" data-nav="${back}">Go back</a></div>`);
+}
+
+/* ============================== MODALS ============================== */
+function modalConfirmPublish(newsId){
+  openModal(`
+    <div class="modal">
+      <h2>Publish this article?</h2>
+      <div class="modal-desc">It will appear on your website immediately and students will be able to read it.</div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" data-action="close-modal">Cancel</button>
+        <button class="btn btn-primary" data-action="do-publish" data-id="${esc(newsId)}">Publish News</button>
+      </div>
+    </div>`);
+}
+function modalNewsPreview(n){
+  openModal(`
+    <div class="modal wide">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <span class="pill pill-blue">Preview</span>
+        <button class="icon" data-action="close-modal" style="cursor:pointer;color:var(--muted);">${ICON.x}</button>
+      </div>
+      <div style="height:180px;border-radius:10px;background:linear-gradient(135deg,#2c5f7c,#123244);"></div>
+      <div class="meta">${esc(n.category)} · ${esc(n.author)}</div>
+      <h2 style="font-size:24px;">${esc(n.title)||'Untitled article'}</h2>
+      <div style="color:var(--muted);">${esc(n.desc)}</div>
+      <div style="white-space:pre-wrap;">${nl2br(n.body)}</div>
+      <div class="modal-actions"><button class="btn btn-primary" data-action="close-modal">Close preview</button></div>
+    </div>`);
+}
+function modalChooseImage(target){
+  STATE.imagePicker = target;
+  openModal(`
+    <div class="modal wide">
+      <h2>Choose an image</h2>
+      <div class="modal-desc">Pick a sample photo for this ${target==='profilePhoto'?'profile':target==='bannerHero'?'banner':'article'}.</div>
+      <div class="swatch-grid">
+        ${SWATCHES.map((s,i)=>`<div class="swatch" style="background-image:${s.bg};" data-action="pick-image" data-idx="${i}">${esc(s.name)}</div>`).join('')}
+      </div>
+      <div class="modal-actions"><button class="btn btn-ghost" data-action="close-modal">Cancel</button></div>
+    </div>`);
+}
+
+/* ============================== RENDER ============================== */
+function render(){
+  const parts = currentRoute();
+  const root = parts[0] || 'overview';
+  let html = '';
+  if(root==='overview') html = pageOverview();
+  else if(root==='appointments' && parts[1]) html = pageAppointmentDetail(parts[1]);
+  else if(root==='appointments') html = pageAppointments();
+  else if(root==='news' && parts[1]==='new') html = pageNewsEditor('new');
+  else if(root==='news' && parts[1]) html = pageNewsEditor(parts[1]);
+  else if(root==='news') html = pageNews();
+  else if(root==='banners') html = pageBanners();
+  else if(root==='team' && parts[1]==='new') html = pageProfileEditor('new');
+  else if(root==='team' && parts[1]) html = pageProfileEditor(parts[1]);
+  else if(root==='team') html = pageTeam();
+  else html = pageOverview();
+
+  document.getElementById('app').innerHTML = html;
+  window.scrollTo(0,0);
+  wireSearchInputs();
+}
+function wireSearchInputs(){
+  const a = document.getElementById('apptSearchInput');
+  if(a) a.addEventListener('input', e=>{ apptSearch = e.target.value; render(); a.focus(); a.setSelectionRange(a.value.length, a.value.length); });
+  const n = document.getElementById('newsSearchInput');
+  if(n) n.addEventListener('input', e=>{ newsSearch = e.target.value; render(); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
+  const t = document.getElementById('teamSearchInput');
+  if(t) t.addEventListener('input', e=>{ teamSearch = e.target.value; render(); t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+}
+
+/* ============================== EVENT DELEGATION ============================== */
+document.addEventListener('click', function(e){
+  const navEl = e.target.closest('[data-nav]');
+  const actionEl = e.target.closest('[data-action]');
+
+  if(navEl){
+    e.preventDefault();
+    navigate('#/' + navEl.getAttribute('data-nav'));
+    STATE.sidebarOpen = false;
+    return;
+  }
+  if(!actionEl) return;
+  const action = actionEl.getAttribute('data-action');
+  const id = actionEl.getAttribute('data-id');
+
+  switch(action){
+    case 'toggle-sidebar': STATE.sidebarOpen = !STATE.sidebarOpen; render(); break;
+    case 'close-sidebar': STATE.sidebarOpen = false; render(); break;
+    case 'view-website': toast('This demo workspace has no live website connected.'); break;
+    case 'add-appointment': toast('Appointment creation is not available in this demo.'); break;
+    case 'appt-filter': apptFilter = actionEl.getAttribute('data-val'); render(); break;
+    case 'news-filter': newsFilter = actionEl.getAttribute('data-val'); render(); break;
+    case 'team-filter': teamFilter = actionEl.getAttribute('data-val'); render(); break;
+
+    case 'confirm-appt': {
+      const a = DATA.appointments.find(x=>x.id===id);
+      if(a){ a.status = 'confirmed'; a.counsellor = document.getElementById('apptCounsellor')?.value || a.counsellor; }
+      toast('Appointment confirmed');
+      render();
+      break;
+    }
+    case 'propose-time': toast('A new time proposal has been sent to the student.'); break;
+    case 'cancel-appt': {
+      const a = DATA.appointments.find(x=>x.id===id);
+      if(a) a.status = 'completed';
+      toast('Request cancelled');
+      navigate('#/appointments');
+      break;
+    }
+
+    case 'news-save-draft': saveNewsForm(id, 'draft'); toast('Draft saved'); render(); break;
+    case 'news-publish': {
+      const draftId = collectNewsForm(id);
+      modalConfirmPublish(draftId);
+      break;
+    }
+    case 'do-publish': {
+      saveNewsForm(id, 'published');
+      closeModal();
+      toast('News published to your website');
+      navigate('#/news');
+      break;
+    }
+    case 'news-preview': {
+      const tempId = collectNewsForm(id);
+      const n = DATA.news.find(x=>x.id===tempId);
+      if(n) modalNewsPreview(n);
+      break;
+    }
+
+    case 'select-banner': STATE.selectedBanner = id; render(); break;
+    case 'toggle-banner-active': {
+      const b = DATA.banners.find(x=>x.id===id);
+      if(b) b.active = !b.active;
+      render();
+      break;
+    }
+    case 'save-banner': saveBannerForm(id); toast('Banner changes saved'); render(); break;
+    case 'add-banner': toast('New banner slots are limited in this demo.'); break;
+
+    case 'add-profile': navigate('#/team/new'); break;
+    case 'profile-save': saveProfileForm(id); toast('Profile saved'); navigate('#/team'); break;
+    case 'profile-preview': toast('Preview matches the panel on the right.'); break;
+    case 'toggle-profile-visible': {
+      const t = DATA.team.find(x=>x.id===id);
+      if(t){ t.status = t.status==='published' ? 'draft' : 'published'; }
+      render();
+      break;
+    }
+
+    case 'choose-image': modalChooseImage(actionEl.getAttribute('data-target')); break;
+    case 'pick-image': {
+      const idx = Number(actionEl.getAttribute('data-idx'));
+      const s = SWATCHES[idx];
+      if(STATE.imagePicker==='bannerHero'){
+        const b = DATA.banners.find(x=>x.id===STATE.selectedBanner);
+        if(b) b.bg = s.bg;
+      }
+      closeModal();
+      toast(`Image "${s.name}" selected`);
+      render();
+      break;
+    }
+    case 'close-modal': closeModal(); break;
+  }
+});
+
+// Live-update the profile preview panel as the admin types
+document.addEventListener('input', function(e){
+  if(e.target.id==='profileName'){ const p=document.getElementById('previewName'); if(p) p.textContent = e.target.value || 'Full name'; }
+  if(e.target.id==='profileRole'){ const p=document.getElementById('previewRole'); if(p) p.textContent = e.target.value || 'Position / title'; }
+  if(e.target.id==='profileIntro'){ const p=document.getElementById('previewIntro'); if(p) p.textContent = e.target.value || 'Short introduction appears here.'; }
+});
+
+function collectNewsForm(id){
+  const isNew = !id;
+  let n = isNew ? null : DATA.news.find(x=>x.id===id);
+  const title = document.getElementById('newsTitle')?.value ?? (n?n.title:'');
+  const desc = document.getElementById('newsDesc')?.value ?? (n?n.desc:'');
+  const category = document.getElementById('newsCategory')?.value ?? (n?n.category:'Student guide');
+  const author = document.getElementById('newsAuthor')?.value ?? (n?n.author:'Go Go Hankuk');
+  const slug = document.getElementById('newsSlug')?.value ?? (n?n.slug:'');
+  const body = document.getElementById('newsBody')?.value ?? (n?n.body:'');
+  if(!n){
+    n = {id: uid('N'), title, desc, category, author, slug, body, status:'draft', updated:'Just now', publishDate:'Publish immediately'};
+    DATA.news.unshift(n);
+  } else {
+    Object.assign(n, {title, desc, category, author, slug, body});
+  }
+  return n.id;
+}
+function saveNewsForm(id, status){
+  const newId = collectNewsForm(id);
+  const n = DATA.news.find(x=>x.id===newId);
+  if(n){ n.status = status; n.updated = 'Just now'; }
+  if(!id) navigate('#/news/'+newId);
+}
+function saveBannerForm(id){
+  const b = DATA.banners.find(x=>x.id===id);
+  if(!b) return;
+  b.title = document.getElementById('bannerTitle')?.value ?? b.title;
+  b.subtitle = document.getElementById('bannerSubtitle')?.value ?? b.subtitle;
+  b.button = document.getElementById('bannerButton')?.value ?? b.button;
+  b.dest = document.getElementById('bannerDest')?.value ?? b.dest;
+  b.alt = document.getElementById('bannerAlt')?.value ?? b.alt;
+}
+function saveProfileForm(id){
+  const isNew = !id;
+  let t = isNew ? null : DATA.team.find(x=>x.id===id);
+  const name = document.getElementById('profileName')?.value ?? '';
+  const role = document.getElementById('profileRole')?.value ?? '';
+  const group = document.getElementById('profileGroup')?.value ?? 'Our Team';
+  const order = Number(document.getElementById('profileOrder')?.value) || (DATA.team.length+1);
+  const intro = document.getElementById('profileIntro')?.value ?? '';
+  const bio = document.getElementById('profileBio')?.value ?? '';
+  const initials = name.trim() ? name.trim().split(/\s+/).slice(0,2).map(w=>w[0].toUpperCase()).join('') : '--';
+  if(!t){
+    t = {id: uid('T'), name, role, group, order, intro, bio, status:'draft', initials};
+    DATA.team.push(t);
+  } else {
+    Object.assign(t, {name, role, group, order, intro, bio, initials});
+  }
+}
+
+/* ============================== INIT ============================== */
+render();
+</script>
