@@ -25,7 +25,16 @@
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,h3,p{margin:0;}
-  .h-manrope, .btn, .navlabel, .tabbtn, .th, .kpi-value, .cardtitle, th{font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;}
+  /* Figma uses Manrope Bold for every emphasized/heading element and DM Sans Regular for body text.
+     Every bold weight in this file (700/800, inline or via class) is mapped to Manrope here so the
+     mapping holds everywhere at once, rather than per-element. */
+  h1,h2,h3,
+  .h-manrope, .btn, .navlabel, .tabbtn, .th, .kpi-value, .cardtitle, th,
+  .status-pill, .pill, .team-name, .shortcut-title, .backlink,
+  [style*="font-weight:800"], [style*="font-weight: 800"],
+  [style*="font-weight:700"], [style*="font-weight: 700"]{
+    font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;
+  }
   button{font:inherit; cursor:pointer;}
   input, select, textarea{font:inherit;}
   a{color:inherit; text-decoration:none;}
@@ -167,6 +176,7 @@
   select.selectlike, .selectlike{
     height:42px; padding:0 14px; border:1px solid var(--line); border-radius:var(--radius-sm);
     background:var(--white); color:var(--ink); font-weight:700; font-size:13px;
+    display:flex; align-items:center; justify-content:center; text-align:center; white-space:nowrap;
   }
 
   /* ---------- form fields ---------- */
