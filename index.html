@@ -296,7 +296,7 @@
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script src="seed-data.js"></script>
-<script src="../cms-bridge.js"></script>
+<script src="cms-bridge.js"></script>
 <script>
 /* ============================== ICONS ============================== */
 const ICON = {
@@ -333,9 +333,9 @@ let DATA = {
   news: window.GGH_SEED.news,
   universities: window.GGH_SEED.universities,
   mainBanner: {
-    // Points at the site's actual live banner file, not a separate dashboard copy —
-    // see the prefix-stripping note in publishToSite() below.
-    image:'../gogo home/assets/web-banner.png',
+    // Points at the site's actual live banner file (absolute URL — the dashboard
+    // and site are separate Netlify deploys, so a relative path can't reach it).
+    image:'https://gogohankuktest.netlify.app/assets/web-banner.png',
     alt:'Go Go Hankuk Korea Education Consultancy banner',
     updated:'Current live banner',
   },
@@ -375,16 +375,12 @@ function publishToSite(){
     news: DATA.news.filter(n=>n.status==='published'),
     team: DATA.team.filter(t=>t.status==='published').slice().sort((a,b)=>a.order-b.order),
     banners: DATA.banners.filter(b=>b.active).slice().sort((a,b)=>a.order-b.order),
-    // Same folder-prefix issue as university logos, reversed: the dashboard shows
-    // the live banner via a "../gogo home/" prefix (it's one folder over), so
-    // strip it for the site itself. An uploaded replacement is a data: URL and
-    // passes through as-is.
-    mainBanner: { ...DATA.mainBanner, image: DATA.mainBanner.image.replace(/^\.\.\/gogo home\//, '') },
-    universities: DATA.universities.filter(u=>u.status==='published').slice().sort((a,b)=>a.order-b.order)
-      // Logos are shown from the dashboard (one folder up) with a "../gogo home/"
-      // prefix; strip it so the site (already inside gogo home/) resolves the
-      // same file correctly. Uploaded logos are data: URLs and pass through as-is.
-      .map(u=>({ ...u, logo: u.logo.replace(/^\.\.\/gogo home\//, '') })),
+    // Default image/logo values are already absolute URLs pointing at the live
+    // site (dashboard and site are separate Netlify deploys, so relative paths
+    // can't cross between them). Uploaded replacements are data: URLs and work
+    // wherever they're read, no special-casing needed.
+    mainBanner: DATA.mainBanner,
+    universities: DATA.universities.filter(u=>u.status==='published').slice().sort((a,b)=>a.order-b.order),
   };
   if (window.GGH_CMS) window.GGH_CMS.write({ content: content });
 }
@@ -1225,7 +1221,7 @@ document.addEventListener('click', function(e){
   switch(action){
     case 'toggle-sidebar': STATE.sidebarOpen = !STATE.sidebarOpen; render(); break;
     case 'close-sidebar': STATE.sidebarOpen = false; render(); break;
-    case 'view-website': window.open('../gogo home/index.html', '_blank'); break;
+    case 'view-website': window.open('https://gogohankuktest.netlify.app/', '_blank'); break;
     case 'add-appointment': toast('Appointment creation is not available in this demo.'); break;
     case 'appt-filter': apptFilter = actionEl.getAttribute('data-val'); render(); break;
     case 'news-filter': newsFilter = actionEl.getAttribute('data-val'); render(); break;
