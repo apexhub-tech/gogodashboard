@@ -295,6 +295,8 @@
 <div id="app"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
+<script src="seed-data.js"></script>
+<script src="../cms-bridge.js"></script>
 <script>
 /* ============================== ICONS ============================== */
 const ICON = {
@@ -312,6 +314,7 @@ const ICON = {
   arrowleft:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>`,
   x:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
   menu:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>`,
+  university:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-6h6v6"/><path d="M4 21h16"/></svg>`,
   plus:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>`,
 };
 function icon(name){ return `<span class="icon">${ICON[name]||''}</span>`; }
@@ -320,43 +323,82 @@ function icon(name){ return `<span class="icon">${ICON[name]||''}</span>`; }
 const uid = (()=>{let n=1000; return (p)=>`${p}-${n++}`;})();
 
 let DATA = {
-  appointments: [
-    {id:'APT-0031', student:'Thiri Aye', phone:'09 512 334 482', date:'14 Sep 2026', dateSort:'2026-09-14', time:'09:30 AM', topic:'Korean classes', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 01', status:'confirmed', message:'Looking forward to discussing beginner Korean class schedules.'},
-    {id:'APT-0024', student:'Min Khant', phone:'09 771 220 482', date:'14 Sep 2026', dateSort:'2026-09-14', time:'10:15 AM', topic:'Study in Korea', location:'Online', meetingType:'Online consultation', counsellor:'Unassigned', status:'pending', message:'I would like to understand university options and the documents needed to begin my application.'},
-    {id:'APT-0032', student:'Su Htet', phone:'09 250 118 902', date:'14 Sep 2026', dateSort:'2026-09-14', time:'11:00 AM', topic:'University options', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 02', status:'confirmed', message:'Want to compare a few partner universities before applying.'},
-    {id:'APT-0033', student:'Aung Hein', phone:'09 660 442 118', date:'14 Sep 2026', dateSort:'2026-09-14', time:'01:30 PM', topic:'Study in Korea', location:'Office', meetingType:'In-person consultation', counsellor:'Unassigned', status:'pending', message:'First-time applicant, would like a general overview.'},
-    {id:'APT-0034', student:'May Thu', phone:'09 330 887 261', date:'15 Sep 2026', dateSort:'2026-09-15', time:'10:00 AM', topic:'Korean classes', location:'Online', meetingType:'Online consultation', counsellor:'Counsellor 01', status:'confirmed', message:'Wants to know about evening class options.'},
-    {id:'APT-0035', student:'Nyein Chan', phone:'09 118 552 900', date:'15 Sep 2026', dateSort:'2026-09-15', time:'02:00 PM', topic:'University options', location:'Office', meetingType:'In-person consultation', counsellor:'Unassigned', status:'pending', message:'Needs help comparing scholarship-eligible programs.'},
-    {id:'APT-0018', student:'Kyaw Zin', phone:'09 902 114 773', date:'11 Sep 2026', dateSort:'2026-09-11', time:'09:00 AM', topic:'Study in Korea', location:'Office', meetingType:'In-person consultation', counsellor:'Counsellor 02', status:'completed', message:'Completed intro consultation.'},
-    {id:'APT-0012', student:'Hnin Wai', phone:'09 445 902 371', date:'09 Sep 2026', dateSort:'2026-09-09', time:'03:00 PM', topic:'Korean classes', location:'Online', meetingType:'Online consultation', counsellor:'Counsellor 01', status:'completed', message:'Completed placement discussion.'},
-  ],
-  news: [
-    {id:'N-1', title:'Preparing for your Korean study journey', desc:'A practical starting point for planning your studies in Korea.', category:'Student guide', status:'published', updated:'14 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'korean-study-journey', body:'Every study journey begins with a clear plan. Our team can help you explore Korean language classes, university options and the preparation needed for your next chapter.\n\nBook a consultation to discuss your goals and ask the questions that matter to you.'},
-    {id:'N-2', title:'Korean language classes: upcoming intake', desc:'New evening and weekend sections are now open for enrollment.', category:'Language classes', status:'draft', updated:'13 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'language-classes-intake', body:'Our next intake opens soon, with beginner through intermediate sections available in the evenings and on weekends.\n\nSeats are limited — enroll early to secure your preferred schedule.'},
-    {id:'N-3', title:'Meet our university partners', desc:'An introduction to the partner universities available through Go Go Hankuk.', category:'University news', status:'published', updated:'12 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'university-partners', body:'We work with a growing network of partner universities across Korea, spanning language programs, undergraduate and graduate study.\n\nTalk to a counsellor to find the right fit for your goals.'},
-    {id:'N-4', title:'A new chapter for our students', desc:'Stories from students who recently began their studies in Korea.', category:'Student stories', status:'published', updated:'10 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'new-chapter-students', body:'Hear directly from students who have recently started their programs — the preparation, the nerves, and the excitement of the first semester.'},
-    {id:'N-5', title:'Visit Go Go Hankuk for a consultation', desc:'Walk-in and scheduled consultations are now available at our office.', category:'Announcements', status:'draft', updated:'09 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'visit-for-consultation', body:'Our office is open for both walk-in and scheduled consultations. Bring your questions about classes, universities, or the application process.'},
-    {id:'N-6', title:'Inside our Yangon classroom', desc:'A look at the facilities and teaching approach at our Yangon campus.', category:'Campus life', status:'published', updated:'08 Sep 2026', author:'Go Go Hankuk', publishDate:'Publish immediately', slug:'yangon-classroom', body:'Take a look inside our Yangon classroom, where small class sizes and dedicated instructors help students build confidence in Korean.'},
-  ],
+  // Cleared for your own testing — submit the "Book a consultation" form on the
+  // live site and the request will appear here (see ingestAppointments() below).
+  appointments: [],
+  // News, team ("Our Team" group) and universities are seeded from the site's
+  // actual content.js via seed-data.js, generated by a one-off script — see
+  // memory/project_cms_bridge.md. Leadership (below) isn't in content.js; it's
+  // hardcoded on about.html, so it's kept here to match what the site really shows.
+  news: window.GGH_SEED.news,
+  universities: window.GGH_SEED.universities,
   mainBanner: {
-    image:'assets/banner/main-banner-current.png',
-    alt:'Go Go Hankuk masthead banner: mascot character beside a Burmese-language tagline, the GO GO HANKUK wordmark and the circular Go Go Hankuk Korea Education Consultancy logo badge',
-    updated:'Original site graphic',
+    // Points at the site's actual live banner file, not a separate dashboard copy —
+    // see the prefix-stripping note in publishToSite() below.
+    image:'../gogo home/assets/web-banner.png',
+    alt:'Go Go Hankuk Korea Education Consultancy banner',
+    updated:'Current live banner',
   },
   banners: [
-    {id:'B-1', title:'Study in Korea', subtitle:'Your future begins with Go Go Education', button:'Discover our programs', dest:'Academic', alt:'Students studying together in a library', active:true, order:1, bg:'linear-gradient(135deg,#16465e,#0a2c3d)'},
-    {id:'B-2', title:'Korean language classes', subtitle:'New intakes open for evening and weekend sections', button:'View class schedule', dest:'Language classes', alt:'Students in a Korean language classroom', active:true, order:2, bg:'linear-gradient(135deg,#0f3a52,#09243b)'},
-    {id:'B-3', title:'Book a consultation', subtitle:'Talk to a counsellor about your study options', button:'Book now', dest:'Appointments', alt:'A counsellor meeting with a student', active:true, order:3, bg:'linear-gradient(135deg,#1c5473,#123c53)'},
+    {id:'B-1', title: window.GGH_SEED.hero.title, subtitle: window.GGH_SEED.hero.description.replace('<br>',' '), button:'Get Appointment', dest:'Admissions', alt:'Students collaborating on their studies', active:true, order:1, bg:'linear-gradient(135deg,#16465e,#0a2c3d)'},
+    {id:'B-2', title:'Korean language classes', subtitle:'New intakes open for evening and weekend sections', button:'View class schedule', dest:'Language classes', alt:'Students in a Korean language classroom', active:false, order:2, bg:'linear-gradient(135deg,#0f3a52,#09243b)'},
+    {id:'B-3', title:'Book a consultation', subtitle:'Talk to a counsellor about your study options', button:'Book now', dest:'Appointments', alt:'A counsellor meeting with a student', active:false, order:3, bg:'linear-gradient(135deg,#1c5473,#123c53)'},
   ],
   team: [
     {id:'T-1', name:'Zun Phu Wai', role:'Founder & Managing Director', group:'Leadership', status:'published', initials:'ZW', order:1, intro:'Leading Go Go Hankuk’s vision and supporting students on their education journey.', bio:'Zun Phu Wai is the Founder and Chief Executive Officer of Go Go Hankuk, leading the company’s strategic direction and overall operations.\n\nHer leadership is centered on professional, transparent and student-focused services.'},
     {id:'T-2', name:'Nay Myo Thura Naing', role:'Director', group:'Leadership', status:'published', initials:'NN', order:2, intro:'Overseeing daily operations and partnerships with universities in Korea.', bio:'Nay Myo Thura Naing directs operations and maintains Go Go Hankuk’s partnerships with universities and language institutes across Korea.'},
-    {id:'T-3', name:'Staff member 01', role:'Student counsellor', group:'Our Team', status:'draft', initials:'01', order:3, intro:'Helping students plan their consultations and applications.', bio:'Staff member 01 supports students from their first inquiry through their application to study in Korea.'},
-    {id:'T-4', name:'Staff member 02', role:'Admissions coordinator', group:'Our Team', status:'draft', initials:'02', order:4, intro:'Coordinating admissions documents and university submissions.', bio:'Staff member 02 coordinates admissions paperwork and liaises with partner universities on behalf of students.'},
-    {id:'T-5', name:'Staff member 03', role:'Korean language instructor', group:'Our Team', status:'draft', initials:'03', order:5, intro:'Teaching beginner and intermediate Korean language classes.', bio:'Staff member 03 teaches Korean language classes and designs curriculum for new intakes.'},
-    {id:'T-6', name:'Staff member 04', role:'Office administration', group:'Our Team', status:'draft', initials:'04', order:6, intro:'Keeping the office running and supporting walk-in visitors.', bio:'Staff member 04 manages front-office administration and welcomes walk-in visitors and students.'},
+    ...window.GGH_SEED.team,
   ],
 };
+
+/* ============================== PERSISTENCE + PUBLISH TO SITE ==============================
+   Local test wiring: everything the admin edits (including drafts) is saved to this
+   dashboard's own localStorage so a refresh doesn't lose your work. Whenever something
+   publish-relevant changes, publishToSite() writes the *public* slice of DATA to the
+   shared GGH_CMS bridge (see cms-bridge.js), which the client site reads on load and
+   live-updates from while open. Swap this file's localStorage calls for Firestore later
+   without touching the rest of the dashboard. */
+const ADMIN_STATE_KEY = 'ggh_admin_full_v2';
+(function hydrateAdminState(){
+  try {
+    const raw = localStorage.getItem(ADMIN_STATE_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved && typeof saved === 'object') Object.assign(DATA, saved);
+  } catch (e) { /* ignore corrupt/old data */ }
+})();
+function persistAdmin(){
+  try { localStorage.setItem(ADMIN_STATE_KEY, JSON.stringify(DATA)); } catch (e) {}
+}
+function publishToSite(){
+  const content = {
+    news: DATA.news.filter(n=>n.status==='published'),
+    team: DATA.team.filter(t=>t.status==='published').slice().sort((a,b)=>a.order-b.order),
+    banners: DATA.banners.filter(b=>b.active).slice().sort((a,b)=>a.order-b.order),
+    // Same folder-prefix issue as university logos, reversed: the dashboard shows
+    // the live banner via a "../gogo home/" prefix (it's one folder over), so
+    // strip it for the site itself. An uploaded replacement is a data: URL and
+    // passes through as-is.
+    mainBanner: { ...DATA.mainBanner, image: DATA.mainBanner.image.replace(/^\.\.\/gogo home\//, '') },
+    universities: DATA.universities.filter(u=>u.status==='published').slice().sort((a,b)=>a.order-b.order)
+      // Logos are shown from the dashboard (one folder up) with a "../gogo home/"
+      // prefix; strip it so the site (already inside gogo home/) resolves the
+      // same file correctly. Uploaded logos are data: URLs and pass through as-is.
+      .map(u=>({ ...u, logo: u.logo.replace(/^\.\.\/gogo home\//, '') })),
+  };
+  if (window.GGH_CMS) window.GGH_CMS.write({ content: content });
+}
+function ingestAppointments(){
+  if (!window.GGH_CMS) return false;
+  const shared = window.GGH_CMS.read();
+  const incoming = Array.isArray(shared.appointments) ? shared.appointments : [];
+  let added = false;
+  incoming.forEach(a=>{
+    if (!DATA.appointments.some(x=>x.id===a.id)) { DATA.appointments.unshift(a); added = true; }
+  });
+  if (added) persistAdmin();
+  return added;
+}
 
 const SWATCHES = [
   {name:'Library', bg:'linear-gradient(135deg,#2c5f7c,#123244)'},
@@ -368,7 +410,7 @@ const SWATCHES = [
 ];
 
 /* ============================== STATE / ROUTER ============================== */
-let STATE = { selectedBanner: DATA.banners[0].id, sidebarOpen:false, imagePicker:null, mainBannerPending:null };
+let STATE = { selectedBanner: DATA.banners[0].id, sidebarOpen:false, imagePicker:null, mainBannerPending:null, universityLogoPending:null };
 const ORIGINAL_MAIN_BANNER = { image: DATA.mainBanner.image, alt: DATA.mainBanner.alt };
 
 function navigate(hash){ location.hash = hash; }
@@ -417,6 +459,7 @@ const NAV_ITEMS = [
   {key:'main-banner', label:'Main Banner', icon:'banner'},
   {key:'banners', label:'Banners', icon:'image'},
   {key:'team', label:'Team Profiles', icon:'users'},
+  {key:'universities', label:'Universities', icon:'university'},
 ];
 function sidebarHtml(activeKey){
   return `
@@ -470,14 +513,14 @@ function shellWrap(activeKey, crumb, contentHtml){
 
 /* ============================== PAGE: OVERVIEW ============================== */
 function pageOverview(){
-  const todays = DATA.appointments.filter(a=>a.dateSort==='2026-09-14');
+  const recent = DATA.appointments.slice(0,4);
   const pending = DATA.appointments.filter(a=>a.status==='pending').length;
-  const confirmedToday = todays.filter(a=>a.status==='confirmed').length;
+  const confirmedRecent = recent.filter(a=>a.status==='confirmed').length;
   const publishedNews = DATA.news.filter(n=>n.status==='published').length;
   const draftNews = DATA.news.filter(n=>n.status==='draft').length;
   const activeBanners = DATA.banners.filter(b=>b.active).length;
 
-  const rows = todays.slice(0,4).map(a=>`
+  const rows = recent.map(a=>`
     <tr>
       <td>${esc(a.student)}</td>
       <td>${esc(a.time)}</td>
@@ -503,7 +546,7 @@ function pageOverview(){
     </div>
 
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Today’s appointments</div><div class="kpi-value">${String(todays.length).padStart(2,'0')}</div><div class="foot">${confirmedToday} confirmed · ${todays.length-confirmedToday} pending</div></div>
+      <div class="kpi"><div class="label">Recent appointments</div><div class="kpi-value">${String(recent.length).padStart(2,'0')}</div><div class="foot">${confirmedRecent} confirmed · ${recent.length-confirmedRecent} pending</div></div>
       <div class="kpi"><div class="label">Pending requests</div><div class="kpi-value">${String(pending).padStart(2,'0')}</div><div class="foot">Ready for review</div></div>
       <div class="kpi"><div class="label">Published news</div><div class="kpi-value">${String(publishedNews).padStart(2,'0')}</div><div class="foot">${draftNews} draft${draftNews===1?'':'s'} in progress</div></div>
       <div class="kpi"><div class="label">Active banners</div><div class="kpi-value">${String(activeBanners).padStart(2,'0')}</div><div class="foot">Homepage slideshow</div></div>
@@ -512,12 +555,12 @@ function pageOverview(){
     <div class="two-col">
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-          <div class="cardtitle">Today’s appointments</div>
-          <div class="meta">14 Sep 2026</div>
+          <div class="cardtitle">Recent appointments</div>
+          <div class="meta">Newest first</div>
         </div>
         <div class="tablewrap"><table>
           <thead><tr><th>Student</th><th>Time</th><th>Topic</th><th>Status</th></tr></thead>
-          <tbody>${rows || `<tr><td colspan="4" class="meta" style="padding:20px 16px;">No appointments scheduled for today.</td></tr>`}</tbody>
+          <tbody>${rows || `<tr><td colspan="4" class="meta" style="padding:20px 16px;">No appointment requests yet — they'll appear here as soon as someone books a consultation on your website.</td></tr>`}</tbody>
         </table></div>
       </div>
       <div class="card" style="display:flex; flex-direction:column; gap:16px;">
@@ -538,9 +581,13 @@ function pageOverview(){
           <div class="shortcut-ico">${icon('users')}</div>
           <div><div class="shortcut-title">Edit team profiles</div><div class="shortcut-sub">Keep names and roles current</div></div>
         </div>
+        <div class="shortcut" data-nav="universities">
+          <div class="shortcut-ico">${icon('university')}</div>
+          <div><div class="shortcut-title">Edit universities</div><div class="shortcut-sub">Update partner university cards</div></div>
+        </div>
       </div>
     </div>
-    <div class="note-plain">Sample data shown for design preview. All times are Myanmar Time (UTC+6:30).</div>
+    <div class="note-plain">News, team and universities reflect what's actually live on your website. All times are Myanmar Time (UTC+6:30).</div>
   `);
 }
 
@@ -987,6 +1034,99 @@ function pageProfileEditor(id){
   `);
 }
 
+/* ============================== PAGE: UNIVERSITIES ============================== */
+let uniFilter = 'all';
+let uniSearch = '';
+function pageUniversities(){
+  const counts = { all: DATA.universities.length, published: DATA.universities.filter(u=>u.status==='published').length, draft: DATA.universities.filter(u=>u.status==='draft').length };
+  let list = [...DATA.universities].sort((a,b)=>a.order-b.order).filter(u=> uniFilter==='all' || u.status===uniFilter);
+  if(uniSearch.trim()){ const q = uniSearch.trim().toLowerCase(); list = list.filter(u=> u.name.toLowerCase().includes(q)); }
+
+  const rows = list.map(u=>`
+    <div class="team-row" style="background:var(--bg);">
+      <span class="grip" style="color:var(--muted);font-size:15px;">⋮⋮</span>
+      <div style="width:56px;height:56px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;"><img src="${esc(u.logo)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display='none'"></div>
+      <div class="team-namewrap"><div class="team-name">${esc(u.name)}</div><div class="team-role">${esc(u.location||'Location not set')}</div></div>
+      <div style="min-width:100px;">${statusPill(u.status)}</div>
+      <button class="btn btn-ghost btn-sm" data-nav="universities/${u.id}" style="margin-left:auto;">Edit</button>
+    </div>`).join('');
+
+  return shellWrap('universities','Universities', `
+    <div class="page-head">
+      <div><h1>Partner universities</h1><div class="desc">Manage the university cards shown on your Programs page — logo, location, programs and website link.</div></div>
+      <button class="btn btn-primary" data-action="add-university">${icon('plus')} Add university</button>
+    </div>
+    <div class="tabs">
+      <button class="btn ${uniFilter==='all'?'btn-primary':'btn-ghost'}" data-action="uni-filter" data-val="all">All&nbsp; ${counts.all}</button>
+      <button class="btn ${uniFilter==='published'?'btn-primary':'btn-ghost'}" data-action="uni-filter" data-val="published">Published&nbsp; ${counts.published}</button>
+      <button class="btn ${uniFilter==='draft'?'btn-primary':'btn-ghost'}" data-action="uni-filter" data-val="draft">Hidden&nbsp; ${counts.draft}</button>
+    </div>
+    <div class="filters">
+      <div class="search-box" style="width:380px;">${icon('search')}<input id="uniSearchInput" placeholder="Search university name…" value="${esc(uniSearch)}"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div class="cardtitle">Universities on your website</div>
+        <div class="meta">${counts.all} total</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">${rows || `<div class="meta" style="padding:20px 0;">No universities match this view.</div>`}</div>
+    </div>
+  `);
+}
+
+/* ============================== PAGE: UNIVERSITY EDITOR ============================== */
+function pageUniversityEditor(id){
+  const isNew = id === 'new';
+  const u = isNew ? {id:null, slug:'', name:'', logo:'', location:'', programs:'', website:'', status:'draft', order:DATA.universities.length+1} : DATA.universities.find(x=>x.id===id);
+  if(!u) return pageNotFound('universities');
+  const previewSrc = STATE.universityLogoPending ? STATE.universityLogoPending.dataUrl : u.logo;
+  return shellWrap('universities','University editor', `
+    <a class="backlink" data-nav="universities">${icon('arrowleft')} Back to universities</a>
+    <div class="page-head">
+      <h1>${isNew?'Add university':'Edit university'}</h1>
+      <button class="btn btn-primary" data-action="university-save" data-id="${esc(u.id||'')}">Save Changes</button>
+    </div>
+    <div class="two-col">
+      <div class="card" style="display:flex;flex-direction:column;gap:18px;">
+        <div class="form-row">
+          <label>University logo</label>
+          <div class="upload-drop">
+            <div style="width:56px;height:56px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;">${previewSrc?`<img src="${esc(previewSrc)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">`:icon('upload')}</div>
+            <div style="flex:1;min-width:180px;">
+              <div class="upload-title">${STATE.universityLogoPending ? esc(STATE.universityLogoPending.name) : 'Drop a logo here or browse files'}</div>
+              <div class="upload-sub">JPG, PNG or WebP · Square or wide logo on white/transparent background</div>
+            </div>
+            <label class="btn btn-ghost" style="cursor:pointer;">
+              Import image
+              <input type="file" id="universityLogoFileInput" accept="image/png,image/jpeg,image/webp" style="display:none;">
+            </label>
+          </div>
+        </div>
+        <div class="form-row"><label>University name</label><input class="input" id="universityName" value="${esc(u.name)}"></div>
+        <div class="form-row"><label>Location</label><input class="input" id="universityLocation" placeholder="e.g. Suwon, South Korea" value="${esc(u.location)}"></div>
+        <div class="form-row"><label>Available programs</label><textarea class="input" id="universityPrograms" rows="2" placeholder="e.g. Korean language, Bachelor, Master">${esc(u.programs)}</textarea></div>
+        <div class="form-row"><label>Official website</label><input class="input" id="universityWebsite" placeholder="https://…" value="${esc(u.website)}"></div>
+        <div class="form-row"><label>Display order</label><input class="input" id="universityOrder" type="number" value="${u.order}"></div>
+        <div class="toggle-row">
+          <span class="lbl">Show this university on your website</span>
+          <button class="switch ${u.status==='published'?'on':''}" data-action="toggle-university-visible" data-id="${esc(u.id||'')}"></button>
+        </div>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:16px;">
+        <div class="cardtitle">Website preview</div>
+        <div class="meta">Partner Universities card + detail popup</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;border:1px solid var(--line);border-radius:12px;padding:24px;background:#fff;">
+          <div style="width:100px;height:75px;display:flex;align-items:center;justify-content:center;">${previewSrc?`<img src="${esc(previewSrc)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">`:''}</div>
+          <div style="font-weight:700;font-size:15px;text-align:center;" id="previewUniName">${esc(u.name)||'University name'}</div>
+        </div>
+        <div class="meta">Location: <span id="previewUniLocation">${esc(u.location)||'Location details coming soon'}</span></div>
+        <div class="meta">Programs: <span id="previewUniPrograms">${esc(u.programs)||'Programs to be confirmed'}</span></div>
+        <div class="note-plain">These three fields fill the "coming soon" placeholders in the university's detail popup on the Programs page.</div>
+      </div>
+    </div>
+  `);
+}
+
 function pageNotFound(back){
   return shellWrap(back,'Not found', `<div class="card">This item could not be found. <a class="linklike" data-nav="${back}">Go back</a></div>`);
 }
@@ -1047,6 +1187,9 @@ function render(){
   else if(root==='team' && parts[1]==='new') html = pageProfileEditor('new');
   else if(root==='team' && parts[1]) html = pageProfileEditor(parts[1]);
   else if(root==='team') html = pageTeam();
+  else if(root==='universities' && parts[1]==='new') html = pageUniversityEditor('new');
+  else if(root==='universities' && parts[1]) html = pageUniversityEditor(parts[1]);
+  else if(root==='universities') html = pageUniversities();
   else html = pageOverview();
 
   document.getElementById('app').innerHTML = html;
@@ -1060,6 +1203,8 @@ function wireSearchInputs(){
   if(n) n.addEventListener('input', e=>{ newsSearch = e.target.value; render(); n.focus(); n.setSelectionRange(n.value.length, n.value.length); });
   const t = document.getElementById('teamSearchInput');
   if(t) t.addEventListener('input', e=>{ teamSearch = e.target.value; render(); t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+  const u = document.getElementById('uniSearchInput');
+  if(u) u.addEventListener('input', e=>{ uniSearch = e.target.value; render(); u.focus(); u.setSelectionRange(u.value.length, u.value.length); });
 }
 
 /* ============================== EVENT DELEGATION ============================== */
@@ -1080,7 +1225,7 @@ document.addEventListener('click', function(e){
   switch(action){
     case 'toggle-sidebar': STATE.sidebarOpen = !STATE.sidebarOpen; render(); break;
     case 'close-sidebar': STATE.sidebarOpen = false; render(); break;
-    case 'view-website': toast('This demo workspace has no live website connected.'); break;
+    case 'view-website': window.open('../gogo home/index.html', '_blank'); break;
     case 'add-appointment': toast('Appointment creation is not available in this demo.'); break;
     case 'appt-filter': apptFilter = actionEl.getAttribute('data-val'); render(); break;
     case 'news-filter': newsFilter = actionEl.getAttribute('data-val'); render(); break;
@@ -1089,6 +1234,7 @@ document.addEventListener('click', function(e){
     case 'confirm-appt': {
       const a = DATA.appointments.find(x=>x.id===id);
       if(a){ a.status = 'confirmed'; a.counsellor = document.getElementById('apptCounsellor')?.value || a.counsellor; }
+      persistAdmin();
       toast('Appointment confirmed');
       render();
       break;
@@ -1097,12 +1243,13 @@ document.addEventListener('click', function(e){
     case 'cancel-appt': {
       const a = DATA.appointments.find(x=>x.id===id);
       if(a) a.status = 'completed';
+      persistAdmin();
       toast('Request cancelled');
       navigate('#/appointments');
       break;
     }
 
-    case 'news-save-draft': saveNewsForm(id, 'draft'); toast('Draft saved'); render(); break;
+    case 'news-save-draft': saveNewsForm(id, 'draft'); persistAdmin(); toast('Draft saved'); render(); break;
     case 'news-publish': {
       const draftId = collectNewsForm(id);
       modalConfirmPublish(draftId);
@@ -1110,6 +1257,8 @@ document.addEventListener('click', function(e){
     }
     case 'do-publish': {
       saveNewsForm(id, 'published');
+      persistAdmin();
+      publishToSite();
       closeModal();
       toast('News published to your website');
       navigate('#/news');
@@ -1126,6 +1275,8 @@ document.addEventListener('click', function(e){
     case 'toggle-banner-active': {
       const b = DATA.banners.find(x=>x.id===id);
       if(b) b.active = !b.active;
+      persistAdmin();
+      publishToSite();
       render();
       break;
     }
@@ -1135,6 +1286,8 @@ document.addEventListener('click', function(e){
       mb.alt = document.getElementById('mainBannerAlt')?.value ?? mb.alt;
       mb.updated = 'Just now';
       STATE.mainBannerPending = null;
+      persistAdmin();
+      publishToSite();
       toast('Main banner updated');
       render();
       break;
@@ -1144,20 +1297,36 @@ document.addEventListener('click', function(e){
       DATA.mainBanner.alt = ORIGINAL_MAIN_BANNER.alt;
       DATA.mainBanner.updated = 'Original site graphic';
       STATE.mainBannerPending = null;
+      persistAdmin();
+      publishToSite();
       toast('Restored the original banner graphic');
       render();
       break;
     }
 
-    case 'save-banner': saveBannerForm(id); toast('Banner changes saved'); render(); break;
+    case 'save-banner': saveBannerForm(id); persistAdmin(); publishToSite(); toast('Banner changes saved'); render(); break;
     case 'add-banner': toast('New banner slots are limited in this demo.'); break;
 
     case 'add-profile': navigate('#/team/new'); break;
-    case 'profile-save': saveProfileForm(id); toast('Profile saved'); navigate('#/team'); break;
+    case 'profile-save': saveProfileForm(id); persistAdmin(); publishToSite(); toast('Profile saved'); navigate('#/team'); break;
     case 'profile-preview': toast('Preview matches the panel on the right.'); break;
     case 'toggle-profile-visible': {
       const t = DATA.team.find(x=>x.id===id);
       if(t){ t.status = t.status==='published' ? 'draft' : 'published'; }
+      persistAdmin();
+      publishToSite();
+      render();
+      break;
+    }
+
+    case 'uni-filter': uniFilter = actionEl.getAttribute('data-val'); render(); break;
+    case 'add-university': navigate('#/universities/new'); break;
+    case 'university-save': saveUniversityForm(id); persistAdmin(); publishToSite(); toast('University saved'); navigate('#/universities'); break;
+    case 'toggle-university-visible': {
+      const u = DATA.universities.find(x=>x.id===id);
+      if(u){ u.status = u.status==='published' ? 'draft' : 'published'; }
+      persistAdmin();
+      publishToSite();
       render();
       break;
     }
@@ -1204,6 +1373,22 @@ document.addEventListener('change', function(e){
       if(img) img.src = reader.result;
       const title = e.target.closest('.upload-drop')?.querySelector('.upload-title');
       if(title) title.textContent = file.name;
+      toast(`"${file.name}" ready — click Save Changes to apply it`);
+    };
+    reader.readAsDataURL(file);
+  }
+  if(e.target.id==='universityLogoFileInput'){
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    if(!/^image\/(png|jpeg|webp)$/.test(file.type)){
+      toast('Please choose a PNG, JPG or WebP image');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(){
+      STATE.universityLogoPending = { dataUrl: reader.result, name: file.name };
+      render();
       toast(`"${file.name}" ready — click Save Changes to apply it`);
     };
     reader.readAsDataURL(file);
@@ -1259,7 +1444,35 @@ function saveProfileForm(id){
     Object.assign(t, {name, role, group, order, intro, bio, initials});
   }
 }
+function saveUniversityForm(id){
+  const isNew = !id;
+  let u = isNew ? null : DATA.universities.find(x=>x.id===id);
+  const name = document.getElementById('universityName')?.value ?? '';
+  const location = document.getElementById('universityLocation')?.value ?? '';
+  const programs = document.getElementById('universityPrograms')?.value ?? '';
+  const website = document.getElementById('universityWebsite')?.value ?? '';
+  const order = Number(document.getElementById('universityOrder')?.value) || (DATA.universities.length+1);
+  const logo = STATE.universityLogoPending ? STATE.universityLogoPending.dataUrl : (u ? u.logo : '');
+  const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  if(!u){
+    u = {id: uid('U'), slug, name, logo, location, programs, website, order, status:'draft'};
+    DATA.universities.push(u);
+  } else {
+    Object.assign(u, {name, location, programs, website, order, logo});
+  }
+  STATE.universityLogoPending = null;
+}
 
 /* ============================== INIT ============================== */
+ingestAppointments();
+publishToSite();
+if (window.GGH_CMS) {
+  window.GGH_CMS.onUpdate(function(){
+    if (ingestAppointments()) {
+      toast('New appointment request received');
+      render();
+    }
+  });
+}
 render();
 </script>
